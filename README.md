@@ -15,7 +15,7 @@ This figcd CLI aims to ease those frustrations, allowing you to effortlessly int
 - [Usage](#usage)
   - [Running with npx](#running-with-npx)
   - [Running in Github](#running-in-github)
-  - [figcd - Command overview](#figcd-command-overview)
+  - [figcd - cli](#figcd-cli)
     - [Authentication - fig-auth](#authentication)
     - [Get Current Version - current-version](#get-current-version)
     - [Prepare Plugin Version - prepare](#prepare-plugin-version)
@@ -84,7 +84,7 @@ This workflow demonstrates the process of setting up figcd, authenticating with 
 Happy automating!
 
 
-### Running in a Project
+### figcd - cli
 
 If you have the figcd package installed in your project's dependencies, you can run the CLI commands directly:
 
