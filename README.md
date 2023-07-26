@@ -20,6 +20,7 @@ This figcd CLI aims to ease those frustrations, allowing you to effortlessly int
     - [Prepare Plugin Version](#prepare-plugin-version)
     - [Create API Key](#create-api-key)
     - [Release New Version](#release-new-version)
+  - [Running in Github](#running-in-github)
 - [Options](#options)
 - [License](#license)
 
@@ -134,6 +135,41 @@ figcd release [options]
 
 - `-V, --version`: Output the version number of the CLI.
 - `-h, --help`: Display help for the command.
+
+## Running within a GitHub Action
+
+To use figcd within a GitHub Action, follow these steps to set up the necessary authentication token:
+
+1. Obtain a fresh authentication token by running the following command on your local machine:
+```
+npx figcd fig-auth
+```
+This command will prompt you to log in using 2-factor authentication and generate a new Figma API token.
+
+2. Add the created token as a GitHub Action secret. Go to your GitHub repository, click on "Settings" > "Secrets" and then click "New repository secret". Name the secret `FIGMA_WEB_AUTHN_TOKEN` and paste the token value into the "Value" field. Click "Add secret" to save it.
+
+3. In your GitHub Action workflow file (e.g., `.github/workflows/publish.yml`), make the token available as an environment variable using the `env` keyword:
+```
+jobs:
+    my_job:
+    runs-on: ubuntu-latest
+
+    env:
+        FIGMA_WEB_AUTHN_TOKEN: ${{ secrets.FIGMA_WEB_AUTHN_TOKEN }}
+
+    steps:
+        # Add your other steps here
+```
+   
+With these steps completed, figcd will be able to use the authentication token during the GitHub Action run.
+
+### Sample Workflow File
+
+For a complete example of how to use figcd in a GitHub Action, check out our [sample workflow file](examples/publish.yml) located in the `examples` directory.
+
+This workflow demonstrates the process of setting up figcd, authenticating with Figma, and automating the plugin publishing steps. You can use this as a starting point for integrating figcd into your own GitHub Actions.
+
+Happy automating!
 
 ## License
 

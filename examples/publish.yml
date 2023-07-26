@@ -1,0 +1,40 @@
+name: Publish to Figma store
+
+on:
+  push:
+    branches: [ "production" ]
+
+env:
+  # this token needs to be configured in githubs action secret (https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28)
+  # to create a new token run "npx figcd auth"
+env:
+  FIGMA_WEB_AUTHN_TOKEN: ${{ secrets.FIGMA_WEB_AUTHN_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: | 
+        npm install
+
+    - name: Set next Figma version as minor version in package.js
+      run: | 
+        npx figcd prepare
+      
+    - name: Build plugin
+      run: |
+        npm run build
+          
+    - name: Publish new Version to Figma
+      run: | 
+        npx figcd release 
