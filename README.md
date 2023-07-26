@@ -15,7 +15,7 @@ This figcd CLI aims to ease those frustrations, allowing you to effortlessly int
 - [Usage](#usage)
   - [Running with npx](#running-with-npx)
   - [Running in Github](#running-in-github)
-  - [figcd - cli](#figcd-cli)
+  - [figcd - cli](#figcd---cli)
     - [Authentication - fig-auth](#authentication)
     - [Get Current Version - current-version](#get-current-version)
     - [Prepare Plugin Version - prepare](#prepare-plugin-version)
