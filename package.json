@@ -1,0 +1,36 @@
+{
+  "version": "0.0.1",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "read": "^2.1.0"
+  },
+  "name": "figcd",
+  "description": "Figma Plugin CLI Publisher",
+  "main": "index.js",
+  "bin": {
+    "figcd": "bin/cli.js"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parrots-design/figcd.git"
+  },
+  "keywords": [
+    "figma",
+    "cd",
+    "ci/cd",
+    "fastlane",
+    "plugin",
+    "figma-plugin",
+    "cli"
+  ],
+  "author": "Martin Lysk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/parrots-design/figcd/issues"
+  },
+  "homepage": "https://github.com/parrots-design/figcd#readme"
+}
