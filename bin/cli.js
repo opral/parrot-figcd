@@ -115,7 +115,7 @@ async function main() {
         console.log('...Creation and Upload done');
 
         console.log('Releasing prepared Publishing version (' + preparedRelease.version_id + ')...');
-        const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authNToken);
+        const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken);
         console.log('Version '+ publishedVersion.plugin.versions[preparedVersionId].version +' (' + preparedVersionId + ') published');
 
         })
