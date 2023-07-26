@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.0.8",
   "dependencies": {
     "commander": "^11.0.0",
     "read": "^2.1.0"

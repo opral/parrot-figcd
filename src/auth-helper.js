@@ -17,7 +17,7 @@ async function wait(ms) {
 }
 
 module.exports = {
-    authenticate: async function () {
+    5authenticate: async function () {
 
         if (!figmaEmail) {
             figmaEmail = await read({
@@ -52,7 +52,7 @@ module.exports = {
         });
 
         const secondFactorTriggerLoginResult = await secondFactorTriggerLogin.json();
-        console.log(secondFactorTriggerLoginResult);
+        // console.log(secondFactorTriggerLoginResult);
         if (secondFactorTriggerLogin.status === 429) {
             throw new Error('Rate limit hit... try again later');
         } else if (secondFactorTriggerLogin.status === 401) {
@@ -108,7 +108,7 @@ module.exports = {
         });
 
         console.log('Authentication was successfull please add the following variable in your environment');
-        console.log('FIGMA_WEB_AUTHN=' + authnTokenCookie.value);
+        console.log('FIGMA_WEB_AUTHN_TOKEN=' + authnTokenCookie.value);
 
     }
 }
