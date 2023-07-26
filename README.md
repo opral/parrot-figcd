@@ -15,8 +15,8 @@ This figcd CLI aims to ease those frustrations, allowing you to effortlessly int
 - [Usage](#usage)
   - [Running with npx](#running-with-npx)
   - [Running in Github](#running-in-github)
-  - [figcd - cli](#figcd---cli)
-    - [Authentication - fig-auth](#authentication)
+  - [figcd - cli](#figcd--npx figcd auth-cli)
+    - [Authentication - auth](#authentication)
     - [Get Current Version - current-version](#get-current-version)
     - [Prepare Plugin Version - prepare](#prepare-plugin-version)
     - [Create API Key - create-api-key](#create-api-key)
@@ -54,7 +54,7 @@ To use figcd within a GitHub Action, follow these steps to set up the necessary 
 
 1. Obtain a fresh authentication token by running the following command on your local machine:
 ```
-npx figcd fig-auth
+npx figcd auth
 ```
 This command will prompt you to log in using 2-factor authentication and generate a new Figma API token.
 

@@ -22,7 +22,7 @@ async function main() {
         .version("1.0.0");
 
     program
-        .command("fig-auth")
+        .command("auth")
         .description("Authenticate in Figma to get the AuthN Token needed to publish using Figmas web api")
         .action(authenticate)
         
