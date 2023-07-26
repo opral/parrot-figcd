@@ -17,7 +17,7 @@ async function wait(ms) {
 }
 
 module.exports = {
-    5authenticate: async function () {
+    authenticate: async function () {
 
         if (!figmaEmail) {
             figmaEmail = await read({
@@ -52,7 +52,7 @@ module.exports = {
         });
 
         const secondFactorTriggerLoginResult = await secondFactorTriggerLogin.json();
-        // console.log(secondFactorTriggerLoginResult);
+        //console.log(secondFactorTriggerLoginResult);
         if (secondFactorTriggerLogin.status === 429) {
             throw new Error('Rate limit hit... try again later');
         } else if (secondFactorTriggerLogin.status === 401) {
