@@ -1,7 +1,7 @@
 # FIGCD - A CLI Tool for Continuous Delivery of Figma Plugins
 
-[![Version](https://img.shields.io/npm/v/@parrots.design/figcd.svg)](https://www.npmjs.com/package/@parrots.design/figcd)
-[![License](https://img.shields.io/npm/l/@parrots.design/figcd.svg)](https://github.com/yourusername/figcd/blob/main/LICENSE)
+[![Version](https://img.shields.io/npm/v/figcd.svg)](https://www.npmjs.com/package/figcd)
+[![License](https://img.shields.io/npm/l/figcd.svg)](https://github.com/parrots-design/figcd/blob/main/LICENSE)
 
 This CLI tool is inspired by the insightful talk of [Jean-François Bisson at config 2023](https://www.youtube.com/watch?v=s9fwTc0fRs0&ab_channel=Figma) and the incredible work of Fastlane (the counterpart for iOS and Android apps).
 
