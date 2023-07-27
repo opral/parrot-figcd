@@ -181,7 +181,7 @@ module.exports = {
             },
             body: JSON.stringify({
                 "agreed_to_tos": true,
-                "code_uploade": true,
+                "code_uploaded": true,
                 "comments_setting": "enabled",
                 "cover_image_uploaded": false,
                 "icon_uploaded": false,
