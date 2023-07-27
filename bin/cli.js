@@ -111,7 +111,7 @@ async function main() {
 
 
         console.log('Creating and uploading code bundle....');
-        const codeUpload = await uploadCodeBundle(manifestFile, preparedRelease.code_upload_url);
+        await uploadCodeBundle(manifestFile, preparedRelease.code_upload_url);
         console.log('...Creation and Upload done');
 
         console.log('Releasing prepared Publishing version (' + preparedRelease.version_id + ')...');

@@ -151,22 +151,27 @@ module.exports = {
     
         const codeUploadFormData = new FormData();
     
+        // set content type for the next file parameter to js
         // add credentials headers for aws upload request 
         Object.entries(codeUploadInfo.fields).forEach(([name, value]) => codeUploadFormData.append(name, value));
-        // set content type for the next file parameter to js
+        
         codeUploadFormData.set("Content-Type", "text/javascript");
         // 
         codeUploadFormData.append("file", codeBundle);
         console.log('Uploading code bundle');
+
+        
     
-        const codeUploadResponse = await fetch(codeUploadInfo.code_path, codeUploadFormData, {
+        const codeUploadResponse = await fetch(codeUploadInfo.code_path, {
             raw: !0,
-            headers: {
-                "Content-Type": "multipart/form-data",
-                "Cache-Control": "private, max-age=86400"
-            }
+            method: 'POST',
+            body: codeUploadFormData
         })
 
+
+        if (!codeUploadResponse.ok) {
+            throw new Error('Uploading Code to S3 failed (' + codeUploadResponse.status + ')');
+        }
     },
 
     publishRelease: async function(manifestFile, preparedVersionId, signature, authNToken) {
