@@ -106,7 +106,7 @@ async function main() {
         }
         
         console.log('Preparing release....');
-        const preparedRelease = await prepareRelease(manifestFile, storeName, storeDescription, tagline, tags, authnToken);
+        const preparedRelease = await prepareRelease(manifestFile, storeName, storeDescription, releaseNotes, tagline, tags, authnToken);
         console.log('...Release Prepared');
         const preparedVersionId = preparedRelease.version_id;
         const signature = preparedRelease.signature;
@@ -117,7 +117,7 @@ async function main() {
         console.log('...Creation and Upload done');
 
         console.log('Releasing prepared Publishing version (' + preparedRelease.version_id + ')...');
-        const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken);
+        // const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken);
         console.log('Version '+ publishedVersion.plugin.versions[preparedVersionId].version +' (' + preparedVersionId + ') published');
 
         })
