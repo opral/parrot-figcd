@@ -114,7 +114,7 @@ module.exports = {
         return pluginMeta;
     },
 
-    prepareRelease: async function (manifestFile, name, description, tagline, tags, authNToken ) {
+    prepareRelease: async function (manifestFile, name, description, releaseNotes, tagline, tags, authNToken ) {
         const manifest = await readJSONFile(manifestFile);
         
         const prepareReleaseResponse = await fetch("https://www.figma.com/api/plugins/"+manifest.id+"/upload", {
@@ -126,7 +126,7 @@ module.exports = {
             },
             "body": JSON.stringify({
                 "manifest": manifest,
-                "release_notes": "",
+                "release_notes": releaseNotes,
                 "name": name,
                 "description": description,
                 "tagline": tagline,

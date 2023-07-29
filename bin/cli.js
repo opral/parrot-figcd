@@ -88,7 +88,9 @@ async function main() {
                 releaseNotesFile = releaseNotesFile.replace('{{VERSION}}', currentPluginInfo.currentVersionNumber + 1);
             }
             releaseNotes = fs.readFileSync(releaseNotesFile, 'utf8');
-        } else
+        } else if (releaseNotes === undefined) {
+            releaseNotes = "";
+        }
 
         if (storeName === undefined) {
             storeName = currentPluginInfo.currentVersion.name;
