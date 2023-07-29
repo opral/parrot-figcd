@@ -2,6 +2,7 @@
 
 
 // index.js
+const fs = require('fs');
 const { Command, Option } = require("commander");
 const { authenticate } = require('../src/auth-helper');
 const { getPluginInfo, prepareRelease, uploadCodeBundle, publishRelease } = require("../src/figma-helper");
@@ -87,14 +88,13 @@ async function main() {
             if (releaseNotesFile.indexOf('{{VERSION}}')) {
                 releaseNotesFile = releaseNotesFile.replace('{{VERSION}}', currentPluginInfo.currentVersionNumber + 1);
             }
+            console.log("Release Notes file argument found from file: " + releaseNotesFile);
             releaseNotes = fs.readFileSync(releaseNotesFile, 'utf8');
-        } else if (releaseNotes === undefined) {
-            releaseNotes = "";
-        }
+        } 
 
         if (storeName === undefined) {
             storeName = currentPluginInfo.currentVersion.name;
-            console.log('--store-name not provided using current store name', )
+            console.log('--store-name not provided using current store name')
         }
 
         if (tagline === undefined) {
@@ -117,7 +117,7 @@ async function main() {
         console.log('...Creation and Upload done');
 
         console.log('Releasing prepared Publishing version (' + preparedRelease.version_id + ')...');
-        // const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken);
+        const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken);
         console.log('Version '+ publishedVersion.plugin.versions[preparedVersionId].version +' (' + preparedVersionId + ') published');
 
         })
