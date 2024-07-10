@@ -1,8 +1,12 @@
 const fs = require('fs');
-var read = require('read');
+const read = require('read');
+const cookie = require('cookie');
 
 let figmaEmail;
 let figmaPassword;
+
+const figmaCookie = process.env.FIGMA_COOKIE;
+const figmaTsid = process.env.FIGMA_TSID;
 
 const figmaUrl = 'https://www.figma.com/';
 
@@ -18,7 +22,6 @@ async function wait(ms) {
 
 module.exports = {
     authenticate: async function () {
-
         if (!figmaEmail) {
             figmaEmail = await read({
                 prompt: 'Please enter the email address of your Figma account:',
@@ -37,6 +40,8 @@ module.exports = {
             "headers": {
                 "accept": "application/json",
                 "content-type": "application/json",
+                "tsid": figmaTsid,
+                "cookie": figmaCookie,
                 "x-csrf-bypass": "yes",
             },
             "referrer": "https://www.figma.com/login",
@@ -63,24 +68,22 @@ module.exports = {
                 || secondFactorTriggerLoginResult.reason.missing === undefined)) {
             console.log('something went wrong - got 400 but expected two factor request');
             throw new Error('something went wrong - got 400 but expected two factor request');
-        } else if (secondFactorTriggerLogin.status === 400
-            && (secondFactorTriggerLoginResult.reason !== undefined
-                && !secondFactorTriggerLoginResult.reason.sms)) {
-
-            console.log('Non SMS second factor currently not supported');
-            throw new Error('Non SMS second factor currently not supported');
         } else if (secondFactorTriggerLogin.status !== 400) {
             console.log('something went wrong - expected two factor response but got status' + secondFactorTriggerLogin.status);
         }
 
-        const secondFactor = await read({
+        const secondFactor = secondFactorTriggerLoginResult.reason.phone_number ? await read({
             prompt: 'SMS sent to number ending in (' + secondFactorTriggerLoginResult.reason.phone_number + '): please enter the Authentication code:'
+        }) : await read({
+            prompt: 'Please enter the TOTP authentication code:'
         });
 
         const loginResponse = await fetch("https://www.figma.com/api/session/login", {
             "headers": {
                 "accept": "application/json",
                 "content-type": "application/json",
+                "tsid": figmaTsid,
+                "cookie": figmaCookie,
                 "x-csrf-bypass": "yes",
             },
             "referrer": "https://www.figma.com/login",
@@ -95,15 +98,17 @@ module.exports = {
             "mode": "cors",
             "credentials": "include"
         });
-        const loginResponseResult = await loginResponse.json();
+        // const loginResponseResult = await loginResponse.json();
 
-        const cookiesReceived = loginResponse.headers.get('set-cookie').split('; ');
-        const authnTokenCookie = {};
+        const cookiesReceived = loginResponse.headers?.getSetCookie()
+        const authnTokenCookie = {
+            name: '__Host-figma.authn',
+            value: undefined
+        };
         cookiesReceived.forEach(rawCookie => {
-            const [name, value] = rawCookie.split('=');
-            if (name === '__Host-figma.authn') {
-                authnTokenCookie.name = name;
-                authnTokenCookie.value = value;
+            const parsedCookie = cookie.parse(rawCookie);
+            if (parsedCookie[authnTokenCookie.name]) {
+                authnTokenCookie.value = encodeURIComponent(parsedCookie[authnTokenCookie.name]);
             }
         });
 
