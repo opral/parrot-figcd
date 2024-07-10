@@ -54,11 +54,11 @@ async function main() {
      .command("create-api-key")
      .description("Create a Figma api key")
      .addOption(authnTokenOption)
-     .option('-e, --expiriation <number>', 'Exporiration in seconds (default: 240 Seconds)', 240)
+     .option('-e, --expiration <number>', 'Expiration in seconds (default: 240 Seconds)', 240)
      .option('-d, --description <number>', 'Description of the token', 'parrot-cd-generated-token')
      .option('-s, --scopes <scopes...>', 'Scopes for the token', ['files:read'])
-     .action(async ({authnToken, expiriation, description, scopes}) => { 
-        const apiToken = await getFigmaApiToken(authnToken, description, expiriation, scopes)
+     .action(async ({authnToken, expiration, description, scopes}) => { 
+        const apiToken = await getFigmaApiToken(authnToken, description, expiration, scopes)
         console.log(apiToken);
      })
 
