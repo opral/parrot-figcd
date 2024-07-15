@@ -12,4 +12,3 @@ module.exports = {
     fs.writeFileSync(packageFile, JSON.stringify({ ...packageData, version: updatedVersion }, null, 2), 'utf8');
 }
 }
-

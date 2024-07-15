@@ -30,12 +30,12 @@ function readJSONFile(filePath) {
 }
 
 module.exports = {
-    getFigmaApiToken: async function (authNToken, description, expiration, scopes) {
+    getFigmaApiToken: async function (authNToken, recent_user_data, description, expiration, scopes) {
         console.log(authNToken);
         const tokenResponse = await fetch('https://www.figma.com/api/user/dev_tokens', {
             "headers": {
                 "content-type": "application/json",
-                "cookie": "__Host-figma.authn=" + authNToken, // "figma.session=" + sessionToken +';',
+                "cookie": "__Host-figma.authn=" + authNToken + '; recent_user_data=' + recent_user_data +';',
                 "Referer": "https://www.figma.com/",
                 "Referrer-Policy": "origin-when-cross-origin"
             },
@@ -56,8 +56,10 @@ module.exports = {
         const pluginId = manifest.id;
         const pluginsResponse = await fetch("https://www.figma.com/api/plugins", {
             "headers": {
+                "accept": "application/json",
                 "content-type": "application/json",
-                "cookie": "__Host-figma.authn=" + authNToken, // "figma.session=" + sessionToken +';',
+                "cookie": "__Host-figma.authn=" + authNToken + '; recent_user_data=' + recent_user_data +';',
+                "user-agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
                 "Referer": "https://www.figma.com/",
                 "Referrer-Policy": "origin-when-cross-origin"
             },
@@ -82,13 +84,16 @@ module.exports = {
         return currentVersionNumber;
     },
 
-    getPluginInfo: async function (manifestFile, authNToken) {
+    getPluginInfo: async function (manifestFile, authNToken, recent_user_data) {
         const manifest = await readJSONFile(manifestFile);
+        console.log('header '+ "__Host-figma.authn=" + authNToken + '; recent_user_data=' + recent_user_data +';',)
         const pluginId = manifest.id;
         const pluginsResponse = await fetch("https://www.figma.com/api/plugins", {
             "headers": {
+                "accept": "application/json",
                 "content-type": "application/json",
-                "cookie": "__Host-figma.authn=" + authNToken, // "figma.session=" + sessionToken +';',
+                "cookie": "__Host-figma.authn=" + authNToken + '; recent_user_data=' + recent_user_data +';',
+                "user-agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
                 "Referer": "https://www.figma.com/",
                 "Referrer-Policy": "origin-when-cross-origin"
             },
@@ -114,15 +119,17 @@ module.exports = {
         return pluginMeta;
     },
 
-    prepareRelease: async function (manifestFile, name, description, releaseNotes, tagline, tags, authNToken ) {
+    prepareRelease: async function (manifestFile, name, description, releaseNotes, tagline, tags, authNToken, recent_user_data ) {
         const manifest = await readJSONFile(manifestFile);
         
         const prepareReleaseResponse = await fetch("https://www.figma.com/api/plugins/"+manifest.id+"/upload", {
             "headers": {
+                "accept": "application/json",
                 "content-type": "application/json",
-                "cookie": "__Host-figma.authn=" + authNToken, // "figma.session=" + sessionToken +';',
+                "cookie": "__Host-figma.authn=" + authNToken + '; recent_user_data=' + recent_user_data +';',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
                 "Referer": "https://www.figma.com/",
-                "Referrer-Policy": "origin-when-cross-origin"
+                "Referrer-Policy": "origin-when-cross-origin",
             },
             "body": JSON.stringify({
                 "manifest": manifest,
@@ -174,15 +181,17 @@ module.exports = {
         }
     },
 
-    publishRelease: async function(manifestFile, preparedVersionId, signature, authNToken) {
+    publishRelease: async function(manifestFile, preparedVersionId, signature, authNToken, recent_user_data) {
         const manifest = await readJSONFile(manifestFile);
 
         let publishRequest = await fetch("https://www.figma.com/api/plugins/"+manifest.id+"/versions/" + preparedVersionId, {
             "headers": {
+                "accept": "application/json",
                 "content-type": "application/json",
-                "cookie": "__Host-figma.authn=" + authNToken, // "figma.session=" + sessionToken +';',
+                "cookie": "__Host-figma.authn=" + authNToken + '; recent_user_data=' + recent_user_data +';',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
                 "Referer": "https://www.figma.com/",
-                "Referrer-Policy": "origin-when-cross-origin"
+                "Referrer-Policy": "origin-when-cross-origin",
             },
             body: JSON.stringify({
                 "agreed_to_tos": true,

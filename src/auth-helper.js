@@ -57,7 +57,7 @@ module.exports = {
             throw new Error('Rate limit hit... try again later');
         } else if (secondFactorTriggerLogin.status === 401) {
             console.log(secondFactorTriggerLogin.message);
-            throw new Error("Wrong credentials..." + secondFactorTriggerLogin.message);
+            throw new Error("Wrong credentials..." + JSON.stringify(secondFactorTriggerLogin) + secondFactorTriggerLogin.message);
         } else if (secondFactorTriggerLogin.status === 400
             && (secondFactorTriggerLoginResult.reason === undefined
                 || secondFactorTriggerLoginResult.reason.missing === undefined)) {
