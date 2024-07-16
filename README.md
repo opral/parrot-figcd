@@ -60,7 +60,9 @@ This command will prompt you to log in using 2-factor authentication and generat
 
 2. Add the created token as a GitHub Action secret. Go to your GitHub repository, click on "Settings" > "Secrets" and then click "New repository secret". Name the secret `FIGMA_WEB_AUTHN_TOKEN` and paste the token value into the "Value" field. Click "Add secret" to save it.
 
-3. In your GitHub Action workflow file (e.g., `.github/workflows/publish.yml`), make the token available as an environment variable using the `env` keyword:
+3. Do the same for the `FIGMA_RECENT_USER_DATA` secret. This secret is used to authenticate with Figma's web API and is required for publishing plugins.
+
+4. In your GitHub Action workflow file (e.g., `.github/workflows/publish.yml`), make the token available as an environment variable using the `env` keyword:
 ```
 jobs:
     my_job:
@@ -68,6 +70,7 @@ jobs:
 
     env:
         FIGMA_WEB_AUTHN_TOKEN: ${{ secrets.FIGMA_WEB_AUTHN_TOKEN }}
+        FIGMA_RECENT_USER_DATA: ${{ secrets.FIGMA_RECENT_USER_DATA }}
 
     steps:
         # Add your other steps here
@@ -111,6 +114,7 @@ figcd current-version [options]
 **Options:**
 
 - `-t, --authn-token <string>`: Figma AuthN Token (env: FIGMA_WEB_AUTHN_TOKEN)
+- `-u, --recent-user-data <string>`: Figma Recent User Data (env: FIGMA_RECENT_USER_DATA)
 - `-m, --manifest-file <string>`: Filepath to your plugin's manifest.json (default: "./manifest.json")
 - `-h, --help`: Display help for the command.
 
@@ -126,6 +130,7 @@ figcd prepare [options]
 
 - `-p, --package-file <string>`: Filepath to your package.json (default: "package.json")
 - `-t, --authn-token <string>`: Figma AuthN Token (env: FIGMA_WEB_AUTHN_TOKEN)
+- `-u, --recent-user-data <string>`: Figma Recent User Data (env: FIGMA_RECENT_USER_DATA)
 - `-m, --manifest-file <string>`: Filepath to your plugin's manifest.json (default: "./manifest.json")
 - `-h, --help`: Display help for the command.
 
@@ -140,6 +145,7 @@ figcd create-api-key [options]
 **Options:**
 
 - `-t, --authn-token <string>`: Figma AuthN Token (env: FIGMA_WEB_AUTHN_TOKEN)
+- `-u, --recent-user-data <string>`: Figma Recent User Data (env: FIGMA_RECENT_USER_DATA)
 - `-e, --expiration <number>`: Expiration in seconds (default: 240 Seconds) (default: 240)
 - `-d, --description <string>`: Description of the token (default: "figcd-generated-token")
 - `-s, --scopes <scopes```>`: Scopes for the token (default: ["files:read"])

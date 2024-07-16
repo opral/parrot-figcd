@@ -5,12 +5,16 @@
 const fs = require('fs');
 const { Command, Option } = require("commander");
 const { authenticate } = require('../src/auth-helper');
-const { getPluginInfo, prepareRelease, uploadCodeBundle, publishRelease, getFigmaApiToken } = require("../src/figma-helper");
+const { getPluginInfo, prepareRelease, uploadCodeBundle, publishRelease } = require("../src/figma-helper");
 const { updatePackageVersion } = require("../src/package-json-helper");
 
 const authnTokenOption = (new Option('-t, --authn-token <string>', 'Figma AuthN Token'))
 .makeOptionMandatory(true)
 .env('FIGMA_WEB_AUTHN_TOKEN');
+
+const recentUserDataOption = (new Option('-u, --recent-user-data <string>', 'Figma recent user data header'))
+.makeOptionMandatory(true)
+.env('FIGMA_RECENT_USER_DATA');
 
 const manifestFileOption = (new Option('-m, --manifest-file <string>', 'Filepath to your plugins manifest.json')).default('./manifest.json')
 
@@ -18,7 +22,7 @@ async function main() {
     const program = new Command();
     // creating tool
     program
-        .name("parrot-cd")
+        .name("figcd")
         .description("A CLI tool for continues delivery of Figma Plugins")
         .version("1.0.0");
 
@@ -31,9 +35,10 @@ async function main() {
         .command("current-version")
         .description("Get the current Version of the plugin")
         .addOption(authnTokenOption)
+        .addOption(recentUserDataOption)
         .addOption(manifestFileOption)
-        .action(async ({authnToken, manifestFile}) => { 
-            const currentPluginInfo = await getPluginInfo(manifestFile, authnToken); 
+        .action(async ({authnToken, recentUserData, manifestFile}) => { 
+            const currentPluginInfo = await getPluginInfo(manifestFile, authnToken, recentUserData); 
             
             console.log('Current Plugin Version' + currentPluginInfo.currentVersionNumber);
         })
@@ -43,9 +48,10 @@ async function main() {
         .description("Sets the package.json files minor part of the version to the next version of the figma plugin. Expects a valid authN token from figma set to the FIGMA_WEB_AUTHN ENV variable!")
         .option('-p, --package-file <string>', 'Filepath to your package.json', 'package.json')
         .addOption(authnTokenOption)
+        .addOption(recentUserDataOption)
         .addOption(manifestFileOption)
-        .action(async ({manifestFile, packageFile, authnToken}) => { 
-            const currentVersionNumber = (await getPluginInfo(manifestFile, authnToken)).currentVersionNumber; 
+        .action(async ({manifestFile, recentUserData, packageFile, authnToken}) => { 
+            const currentVersionNumber = (await getPluginInfo(manifestFile, authnToken, recentUserData)).currentVersionNumber; 
             updatePackageVersion(packageFile, currentVersionNumber + 1)
             console.log('Minor Version in '+ packageFile + ' updated to '+ (currentVersionNumber+1))
         })
@@ -53,12 +59,13 @@ async function main() {
     program
      .command("create-api-key")
      .description("Create a Figma api key")
+     .addOption(recentUserDataOption)
      .addOption(authnTokenOption)
-     .option('-e, --expiration <number>', 'Expiration in seconds (default: 240 Seconds)', 240)
+     .option('-e, --expiriation <number>', 'Exporiration in seconds (default: 240 Seconds)', 240)
      .option('-d, --description <number>', 'Description of the token', 'parrot-cd-generated-token')
      .option('-s, --scopes <scopes...>', 'Scopes for the token', ['files:read'])
-     .action(async ({authnToken, expiration, description, scopes}) => { 
-        const apiToken = await getFigmaApiToken(authnToken, description, expiration, scopes)
+     .action(async ({authnToken, recentUserData, expiriation, description, scopes}) => { 
+        const apiToken = getFigmaApiToken(authnToken, recentUserData, description, expiriation, scopes)
         console.log(apiToken);
      })
 
@@ -66,6 +73,7 @@ async function main() {
      .command("release")
      .description("Release a new version - expects the build to been done in an earlier step")
      .addOption(authnTokenOption)
+     .addOption(recentUserDataOption)
      .addOption(manifestFileOption)
      .option('-n, --store-name <string>', 'Name of the plugin apearing on the store - falling back to the current one in the store if not specified')
      .option('-d, --store-description <string>', 'Description of the figma plugin')
@@ -75,9 +83,9 @@ async function main() {
      .option('-c, --enable-comments <boolean>', 'Enable Comments - falling back to the current ones in the store if not specified')
      .option('-rn, --release-notes <string>', 'Release Notes', '')
      .option('-rnf, --release-notes-file <string>', 'Release Notes file containing the description of what has changed - {{VERSION}} will be replaced with version figma of the plugin')
-     .action(async ({authnToken, manifestFile, storeName, storeDescription, storeDescriptionFile, tagline, tags, releaseNotes, releaseNotesFile}) => { 
+     .action(async ({authnToken, recentUserData, manifestFile, storeName, storeDescription, storeDescriptionFile, tagline, tags, releaseNotes, releaseNotesFile}) => { 
         
-        const currentPluginInfo = await getPluginInfo(manifestFile, authnToken)
+        const currentPluginInfo = await getPluginInfo(manifestFile, authnToken, recentUserData)
         if (storeDescriptionFile !== undefined && storeDescriptionFile !== '') {
             storeDescription = fs.readFileSync(storeDescriptionFile, 'utf8');
         } if (storeDescription === undefined) {
@@ -106,7 +114,7 @@ async function main() {
         }
         
         console.log('Preparing release....');
-        const preparedRelease = await prepareRelease(manifestFile, storeName, storeDescription, releaseNotes, tagline, tags, authnToken);
+        const preparedRelease = await prepareRelease(manifestFile, storeName, storeDescription, releaseNotes, tagline, tags, authnToken, recentUserData);
         console.log('...Release Prepared');
         const preparedVersionId = preparedRelease.version_id;
         const signature = preparedRelease.signature;
@@ -117,7 +125,7 @@ async function main() {
         console.log('...Creation and Upload done');
 
         console.log('Releasing prepared Publishing version (' + preparedRelease.version_id + ')...');
-        const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken);
+        const publishedVersion = await publishRelease(manifestFile, preparedVersionId, signature, authnToken, recentUserData);
         console.log('Version '+ publishedVersion.plugin.versions[preparedVersionId].version +' (' + preparedVersionId + ') published');
 
         })
