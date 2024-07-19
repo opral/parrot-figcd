@@ -42,7 +42,7 @@ async function runCLI() {
     console.log('Uploading code bundle.... done');
 
     console.log('Releasing prepared version (' + preparedRelease.version_id + ')');
-    const publishedVersion = await publishRelease(manifestPath, preparedVersionId, signature, authNToken);
+    const publishedVersion = await publishRelease(manifestPath, preparedVersionId, signature, authNToken, recent_user_data);
     
     console.log('Version '+ publishedVersion.plugin.versions[preparedVersionId].version +' (' + preparedVersionId + ') published');
   
