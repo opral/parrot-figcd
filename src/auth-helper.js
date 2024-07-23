@@ -1,12 +1,10 @@
 const fs = require('fs');
 const read = require('read');
 const cookie = require('cookie');
+const { getFigmaCookie } = require('./figma-helper');
 
 let figmaEmail;
 let figmaPassword;
-
-const figmaCookie = process.env.FIGMA_COOKIE;
-const figmaTsid = process.env.FIGMA_TSID;
 
 const figmaUrl = 'https://www.figma.com/';
 
@@ -21,7 +19,7 @@ async function wait(ms) {
 }
 
 module.exports = {
-    authenticate: async function () {
+    authenticate: async function ({ cookie: figmaCookie, tsid }) {
         if (!figmaEmail) {
             figmaEmail = await read({
                 prompt: 'Please enter the email address of your Figma account:',
@@ -35,12 +33,20 @@ module.exports = {
                 silent: true,
             })
         }
+        if ([figmaCookie, tsid].includes(undefined)) {
+            const figmaCookies = await getFigmaCookie();
+            figmaCookie = figmaCookies.cookie;
+            tsid = figmaCookies.tsid;
+            console.log('\n');
+            console.log('Cookie argument missing, automatically retrieving fresh session cookies to start authentication');
+            console.log(`FIGMA_COOKIE='${figmaCookie}'; FIGMA_TSID=${tsid}`);
+        }
 
         const secondFactorTriggerLogin = await fetch("https://www.figma.com/api/session/login", {
             "headers": {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "tsid": figmaTsid,
+                "tsid": tsid,
                 "cookie": figmaCookie,
                 "x-csrf-bypass": "yes",
             },
@@ -61,8 +67,7 @@ module.exports = {
         if (secondFactorTriggerLogin.status === 429) {
             throw new Error('Rate limit hit... try again later');
         } else if (secondFactorTriggerLogin.status === 401) {
-            console.log(secondFactorTriggerLogin.message);
-            throw new Error("Wrong credentials..." + JSON.stringify(secondFactorTriggerLogin) + secondFactorTriggerLogin.message);
+            throw new Error("Wrong credentials... " + (secondFactorTriggerLogin.message || ''));
         } else if (secondFactorTriggerLogin.status === 400
             && (secondFactorTriggerLoginResult.reason === undefined
                 || secondFactorTriggerLoginResult.reason.missing === undefined)) {
@@ -82,7 +87,7 @@ module.exports = {
             "headers": {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "tsid": figmaTsid,
+                "tsid": tsid,
                 "cookie": figmaCookie,
                 "x-csrf-bypass": "yes",
             },
@@ -98,22 +103,25 @@ module.exports = {
             "mode": "cors",
             "credentials": "include"
         });
-        // const loginResponseResult = await loginResponse.json();
+        try {
+            const loginResponseResult = await loginResponse.json();
+            console.log(JSON.stringify(loginResponseResult))
+        } catch (err) {}
 
         const cookiesReceived = loginResponse.headers?.getSetCookie()
-        const authnTokenCookie = {
-            name: '__Host-figma.authn',
-            value: undefined
-        };
-        cookiesReceived.forEach(rawCookie => {
+        let authnTokenCookie = undefined;
+        cookiesReceived.forEach((rawCookie) => {
             const parsedCookie = cookie.parse(rawCookie);
-            if (parsedCookie[authnTokenCookie.name]) {
-                authnTokenCookie.value = encodeURIComponent(parsedCookie[authnTokenCookie.name]);
+            if (parsedCookie['__Host-figma.authn']) {
+                authnTokenCookie = encodeURIComponent(parsedCookie['__Host-figma.authn']);
             }
         });
+        if (!authnTokenCookie) {
+            throw new Error("Authn cookie not found");
+        }
 
         console.log('Authentication was successfull please add the following variable in your environment');
-        console.log('FIGMA_WEB_AUTHN_TOKEN=' + authnTokenCookie.value);
+        console.log('FIGMA_WEB_AUTHN_TOKEN=' + authnTokenCookie);
 
     }
 }
