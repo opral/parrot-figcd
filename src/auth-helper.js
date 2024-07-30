@@ -42,6 +42,7 @@ module.exports = {
             console.log(`FIGMA_COOKIE='${figmaCookie}'; FIGMA_TSID=${tsid}`);
         }
 
+        let loginResponse;
         const secondFactorTriggerLogin = await fetch("https://www.figma.com/api/session/login", {
             "headers": {
                 "accept": "application/json",
@@ -62,51 +63,62 @@ module.exports = {
             "credentials": "include"
         });
 
-        const secondFactorTriggerLoginResult = await secondFactorTriggerLogin.json();
-        //console.log(secondFactorTriggerLoginResult);
-        if (secondFactorTriggerLogin.status === 429) {
-            throw new Error('Rate limit hit... try again later');
-        } else if (secondFactorTriggerLogin.status === 401) {
-            throw new Error("Wrong credentials... " + (secondFactorTriggerLogin.message || ''));
-        } else if (secondFactorTriggerLogin.status === 400
-            && (secondFactorTriggerLoginResult.reason === undefined
-                || secondFactorTriggerLoginResult.reason.missing === undefined)) {
-            console.log('something went wrong - got 400 but expected two factor request');
-            throw new Error('something went wrong - got 400 but expected two factor request');
-        } else if (secondFactorTriggerLogin.status !== 400) {
-            console.log('something went wrong - expected two factor response but got status' + secondFactorTriggerLogin.status);
+        if (secondFactorTriggerLogin.status === 200) {
+            loginResponse = secondFactorTriggerLogin;
+            loginResponseResult = await secondFactorTriggerLogin.json();
+            console.log('Warning: 2FA is not enabled.');
+        } else {
+            const secondFactorTriggerLoginResult = await secondFactorTriggerLogin.json();
+            //console.log(secondFactorTriggerLoginResult);
+            if (secondFactorTriggerLogin.status === 429) {
+                throw new Error('Rate limit hit... try again later');
+            } else if (secondFactorTriggerLogin.status === 401) {
+                throw new Error("Wrong credentials... " + (secondFactorTriggerLogin.message || ''));
+            } else if (secondFactorTriggerLogin.status === 400
+                && (secondFactorTriggerLoginResult.reason === undefined
+                    || secondFactorTriggerLoginResult.reason.missing === undefined)) {
+                console.log('something went wrong - got 400 but expected two factor request');
+                throw new Error('something went wrong - got 400 but expected two factor request');
+            } else if (secondFactorTriggerLogin.status !== 400) {
+                console.log('something went wrong - expected two factor response but got status' + secondFactorTriggerLogin.status);
+            }
+
+            let secondFactor;
+            if (secondFactorTriggerLogin.status === 400 && secondFactorTriggerLoginResult.reason?.sms === true) {
+                await read({
+                    prompt: 'SMS sent to number ending in (' + secondFactorTriggerLoginResult.reason?.phone_number + '): please enter the Authentication code:'
+                });
+            } else if (secondFactorTriggerLogin.status === 400 && !secondFactorTriggerLoginResult.reason?.sms) {
+                secondFactor = await read({
+                    prompt: 'Please enter the TOTP authentication code:'
+                });
+            }
+
+            loginResponse = await fetch("https://www.figma.com/api/session/login", {
+                "headers": {
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "tsid": tsid,
+                    "cookie": figmaCookie,
+                    "x-csrf-bypass": "yes",
+                },
+                "referrer": "https://www.figma.com/login",
+                "referrerPolicy": "origin-when-cross-origin",
+                "body": JSON.stringify({
+                    email: figmaEmail,
+                    username: figmaEmail,
+                    password: figmaPassword,
+                    totp_key: secondFactor,
+                }),
+                "method": "POST",
+                "mode": "cors",
+                "credentials": "include"
+            });
+            try {
+                const loginResponseResult = await loginResponse.json();
+                console.log(JSON.stringify(loginResponseResult))
+            } catch (err) {}
         }
-
-        const secondFactor = secondFactorTriggerLoginResult.reason.phone_number ? await read({
-            prompt: 'SMS sent to number ending in (' + secondFactorTriggerLoginResult.reason.phone_number + '): please enter the Authentication code:'
-        }) : await read({
-            prompt: 'Please enter the TOTP authentication code:'
-        });
-
-        const loginResponse = await fetch("https://www.figma.com/api/session/login", {
-            "headers": {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "tsid": tsid,
-                "cookie": figmaCookie,
-                "x-csrf-bypass": "yes",
-            },
-            "referrer": "https://www.figma.com/login",
-            "referrerPolicy": "origin-when-cross-origin",
-            "body": JSON.stringify({
-                email: figmaEmail,
-                username: figmaEmail,
-                password: figmaPassword,
-                totp_key: secondFactor,
-            }),
-            "method": "POST",
-            "mode": "cors",
-            "credentials": "include"
-        });
-        try {
-            const loginResponseResult = await loginResponse.json();
-            console.log(JSON.stringify(loginResponseResult))
-        } catch (err) {}
 
         const cookiesReceived = loginResponse.headers?.getSetCookie()
         let authnTokenCookie = undefined;
