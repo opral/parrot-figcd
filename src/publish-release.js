@@ -1,13 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
-const { getFigmaApiToken, prepareRelease, uploadCodeBundle, publishRelease } = require('./figma-helper.js');
-const { getFigmaFile, getText } = require('./parrot-helper.js');
+const {
+  getFigmaCookie,
+  getFigmaApiToken,
+  prepareRelease,
+  uploadCodeBundle,
+  publishRelease,
+} = require("./figma-helper.js");
+const { getFigmaFile, getText } = require("./parrot-helper.js");
 
 const authNToken = process.env.FIGMA_WEB_AUTHN;
 const figmaFile = process.env.FIGMA_TEXT_FILE;
 const manifestPath = './manifest.json';
-console.log()
+const { cookie } = await getFigmaCookie();
 
 const manifest = JSON.parse(fs.readFileSync(path.resolve('./manifest.json'), 'utf8'));
 
@@ -42,7 +48,15 @@ async function runCLI() {
     console.log('Uploading code bundle.... done');
 
     console.log('Releasing prepared version (' + preparedRelease.version_id + ')');
-    const publishedVersion = await publishRelease(manifestPath, preparedVersionId, signature, authNToken, recent_user_data);
+    const publishedVersion = await publishRelease(
+      manifestPath,
+      preparedVersionId,
+      signature,
+      authNToken,
+      cookie,
+      carouselMedia,
+      carouselVideos
+    );
     
     console.log('Version '+ publishedVersion.plugin.versions[preparedVersionId].version +' (' + preparedVersionId + ') published');
   

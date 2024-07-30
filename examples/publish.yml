@@ -9,7 +9,6 @@ env:
   # to create a new token run "npx figcd auth"
 env:
   FIGMA_WEB_AUTHN_TOKEN: ${{ secrets.FIGMA_WEB_AUTHN_TOKEN }}
-  FIGMA_RECENT_USER_DATA: ${{ secrets.FIGMA_RECENT_USER_DATA }}
 
 jobs:
   build:

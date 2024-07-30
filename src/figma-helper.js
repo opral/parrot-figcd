@@ -117,7 +117,6 @@ module.exports = {
             throw new Error("The provided autn token does not have access to the plugin with the id " + pluginId);
         }
         const currentVersionId = pluginMeta.current_plugin_version_id;
-        // console.log(publishRequestJson.meta.plugin.versions);
         const currentVersionNumber = Number.parseInt(pluginMeta.versions[currentVersionId].version, 10); 
         
         return currentVersionNumber;
@@ -152,7 +151,6 @@ module.exports = {
             throw new Error("The provided autn token does not have access to the plugin with the id " + pluginId);
         }
         const currentVersionId = pluginMeta.current_plugin_version_id;
-        // console.log(publishRequestJson.meta.plugin.versions);
         pluginMeta.currentVersionNumber = Number.parseInt(pluginMeta.versions[currentVersionId].version, 10); 
         pluginMeta.currentVersion = pluginMeta.versions[currentVersionId];
         
@@ -230,7 +228,7 @@ module.exports = {
         Object.entries(codeUploadInfo.fields).forEach(([name, value]) => codeUploadFormData.append(name, value));
         
         codeUploadFormData.set("Content-Type", "text/javascript");
-        // 
+
         codeUploadFormData.append("file", codeBundle);
         console.log('Uploading code bundle');
 

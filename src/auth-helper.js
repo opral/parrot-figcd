@@ -6,12 +6,6 @@ const { getFigmaCookie } = require('./figma-helper');
 let figmaEmail;
 let figmaPassword;
 
-const figmaUrl = 'https://www.figma.com/';
-
-function cookiesSufficient(cookies) {
-    return cookies.length > 0 && cookies.findIndex(cookie => cookie.name === 'recent_user_data') >= 0;
-}
-
 async function wait(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
