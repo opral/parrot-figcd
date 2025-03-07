@@ -180,7 +180,7 @@ module.exports = {
         return categoriesJson.meta;
     },
 
-    prepareRelease: async function (manifestFile, name, description, releaseNotes, tagline, tags, authNToken, category, cookie, imagesSha1) {
+    prepareRelease: async function (manifestFile, name, description, releaseNotes, tagline, tags, authNToken, category, subcategory) {
         const manifest = await readJSONFile(manifestFile);
         
         const prepareReleaseResponse = await fetch("https://www.figma.com/api/plugins/"+manifest.id+"/upload", {
@@ -189,7 +189,7 @@ module.exports = {
                 "content-type": "application/json",
                 "cookie": serializeCookies({
                     "__Host-figma.authn": authNToken,
-                }, cookie),
+                }),
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
                 "Referer": "https://www.figma.com/",
                 "Referrer-Policy": "origin-when-cross-origin",
@@ -199,11 +199,10 @@ module.exports = {
                 "release_notes": releaseNotes,
                 "name": name,
                 "description": description,
-                "images_sha1": imagesSha1,
                 "tagline": tagline,
-                "creator_policy": "",
                 "tags": tags.map(tag => tag.toLowerCase()),
-                "category_id": category
+                "category": category,
+                "subcategory": subcategory
             }),
             method: 'POST'
         });

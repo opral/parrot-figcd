@@ -36,9 +36,11 @@ async function runCLI() {
     const description = getText('plugin_store_description', 'en', figmaDocument);
     const tagline = getText('plugin_store_tagline', 'en', figmaDocument);
     const name = getText('plugin_store_product_name', 'en', figmaDocument);
+    const category = getText('plugin_store_category', 'en', figmaDocument);
+    const subcategory = getText('plugin_store_subcategory', 'en', figmaDocument);
     
     console.log('Preparing release...');
-    const preparedRelease = await prepareRelease(manifestPath, name, description, tagline, tags, authNToken);
+    const preparedRelease = await prepareRelease(manifestPath, name, description, tagline, tags, authNToken, category, subcategory);
     
     const preparedVersionId = preparedRelease.version_id;
     const signature = preparedRelease.signature;

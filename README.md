@@ -165,6 +165,8 @@ figcd release [options]
 - `-c, --enable-comments <boolean>`: Enable Comments - falling back to the current ones in the store if not specified
 - `-rn, --release-notes <string>`: Release Notes (default: "")
 - `-rnf, --release-notes-file <string>`: Release Notes file containing the description of what has changed - {{VERSION}} will be replaced with the version of the Figma plugin
+- `-cat, --category <string>`: Category of the Figma plugin
+- `-subcat, --subcategory <string>`: Subcategory of the Figma plugin
 - `-h, --help`: Display help for the command.
 
 ## Options
