@@ -216,8 +216,8 @@ module.exports = {
     uploadCodeBundle: async function(manifestFile, codeUploadInfo) {
         const manifest = await readJSONFile(manifestFile);
 
-        const main = fs.readFileSync(path.resolve(manifest.main), 'utf8');
-        const ui = fs.readFileSync(path.resolve(manifest.ui), 'utf8');
+        const main = fs.readFileSync(path.resolve(path.join(path.dirname(manifestFile), manifest.main)), 'utf8');
+        const ui = fs.readFileSync(path.resolve(path.join(path.dirname(manifestFile), manifest.ui)), 'utf8');
     
         const codeBundle = createPluginBundle(main, ui);
     
